@@ -27,7 +27,7 @@ for i in html_dir.rglob("*html"):
     )
 
 # Downloading chapters separately
-for i in tqdm(range(START_CHAPTER, LAST_CHAPTER + 1), "fetching chapters...🚀️"):
+for i in tqdm(range(START_CHAPTER, LAST_CHAPTER + 1), "\033[0;1mFetching Chapters...\033[0m🚀️"):
     if i in cached_html_chapters_num:
         continue
     doc_html = get_document(LINK_KD + f"{i}").summary()
@@ -66,7 +66,7 @@ if head_not_found_err:
     # due to cache being present otherwise this list would remain empty.
     head_not_found_err = []
 
-for i in tqdm(cached_html_chapters_path, "processing...🐧️"):
+for i in tqdm(cached_html_chapters_path, "\033[0;1mProcessing...\033[0m⚙️"):
     episode_number = re.search(r"((\d{1,3})-episode)", str(i), flags=re.I).groups()[-1]
     if len(episode_number) == 1:
         episode_number = "0"+episode_number
@@ -93,7 +93,6 @@ for i in tqdm(cached_html_chapters_path, "processing...🐧️"):
                 episode_history.append(episode_number)
 
     doc_md = html_to_md(soup)
-    print(episode_number)
     episode_dir = md_dir.joinpath(f"{episode_number}-episode")
     episode_dir.mkdir(parents=True, exist_ok=True)
 
