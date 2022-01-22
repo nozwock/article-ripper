@@ -27,7 +27,7 @@ for i in html_dir.rglob("*html"):
     )
 
 # Downloading chapters separately
-for i in tqdm(range(START_CHAPTER, LAST_CHAPTER + 1), "\033[0;1mFetching Chapters...\033[0m🚀️"):
+for i in tqdm(range(START_CHAPTER, LAST_CHAPTER + 1), "\033[0;1;91mFetching Chapters...\033[0m🚀️"):
     if i in cached_html_chapters_num:
         continue
     doc_html = get_document(LINK_KD + f"{i}").summary()
@@ -66,7 +66,7 @@ if head_not_found_err:
     # due to cache being present otherwise this list would remain empty.
     head_not_found_err = []
 
-for i in tqdm(cached_html_chapters_path, "\033[0;1mProcessing...\033[0m⚙️"):
+for i in tqdm(cached_html_chapters_path, "\033[0;1;94mProcessing...\033[0m⚙️"):
     episode_number = re.search(r"((\d{1,3})-episode)", str(i), flags=re.I).groups()[-1]
     if len(episode_number) == 1:
         episode_number = "0"+episode_number
@@ -101,4 +101,4 @@ for i in tqdm(cached_html_chapters_path, "\033[0;1mProcessing...\033[0m⚙️"):
 
 
 if head_not_found_err:
-    print(f"\033[0;1mNo heading found for chapters {head_not_found_err}💔️\033[0m")
+    print(f"\033[0;1;93mNo headings found for chapters\033[0;1m {head_not_found_err}💔️\033[0m")
