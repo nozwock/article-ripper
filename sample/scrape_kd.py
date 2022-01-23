@@ -7,7 +7,7 @@ from article_ripper.main import get_document, html_to_md
 START_CHAPTER = 1
 LAST_CHAPTER = 246
 LINK_KD = "https://rainingtl.org/kidnapped-dragons-"
-DEST_DIR = Path.cwd().joinpath("dst")
+DEST_DIR = Path(__file__).parent.joinpath("dst")
 
 # TODO: improve the headings pattern matching
 # TODO: add a parameter to remove those "Sponsered Ads"

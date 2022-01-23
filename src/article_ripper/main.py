@@ -22,3 +22,5 @@ def html_to_md(
     html_text: str, format: str = "html-native_divs-native_spans", *args
 ) -> str:
     return pypandoc.convert_text(source=html_text, to="md", format=format, *args)
+
+# Don't LAUGH!
