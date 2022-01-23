@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "article_ripper"
+version = "0.1.0"
+description = ""
+authors = ["nozwock <57829219+nozwock@users.noreply.github.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+click = "^8.0.3"
+pypandoc = "^1.7.2"
+requests = "^2.27.1"
+readability-lxml = "^0.8.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+tqdm = "^4.62.3"
+black = "^21.12b0"
+beautifulsoup4 = "^4.10.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

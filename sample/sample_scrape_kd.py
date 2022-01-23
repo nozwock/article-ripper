@@ -9,6 +9,9 @@ LAST_CHAPTER = 246
 LINK_KD = "https://rainingtl.org/kidnapped-dragons-"
 DEST_DIR = Path.cwd().joinpath("dst")
 
+# TODO: improve the headings pattern matching
+# TODO: add a parameter to remove those "Sponsered Ads"
+
 # Scraping with some post-processing stuff.
 # Keep in mind that the steps during the post-processing stuff
 # is obviously very specific to this novel/format of article.

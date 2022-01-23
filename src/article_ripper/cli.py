@@ -1,5 +1,5 @@
 import click
-from article_ripper.main import get_document, html_text_to_md
+from article_ripper.main import get_document, html_to_md
 
 
 @click.command()
