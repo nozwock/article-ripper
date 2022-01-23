@@ -76,7 +76,6 @@ if __name__ == "__main__":
     for i in tqdm(
         cached_html_chapters_path, "\033[0;1;94mProcessing...\033[0m⚙️"
     ):
-        tqdm.write(str(i))
         episode_number = re.search(r"((\d{1,3})-episode)", str(i), flags=re.I).groups()[
             -1
         ]
@@ -93,10 +92,6 @@ if __name__ == "__main__":
             heading = soup.find("h3")
             if heading is None:
                 head_not_found_err.append(f"ep{episode_history[-1]} ch{chapter_number}")
-                try:
-                    episode_number = episode_history[-1]
-                except Exception:
-                    episode_number = "err"
 
                 for i in soup.find_all("strong"):
                     #! lazy workaround for when can't find hx
