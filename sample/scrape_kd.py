@@ -30,7 +30,9 @@ for i in html_dir.rglob("*html"):
     )
 
 # Downloading chapters separately
-for i in tqdm(range(START_CHAPTER, LAST_CHAPTER + 1), "\033[0;1;91mFetching Chapters...\033[0m🚀️"):
+for i in tqdm(
+    range(START_CHAPTER, LAST_CHAPTER + 1), "\033[0;1;91mFetching Chapters...\033[0m🚀️"
+):
     if i in cached_html_chapters_num:
         continue
     doc_html = get_document(LINK_KD + f"{i}").summary()
@@ -46,7 +48,7 @@ for i in tqdm(range(START_CHAPTER, LAST_CHAPTER + 1), "\033[0;1;91mFetching Chap
     else:
         episode_number = re.findall(r"\d{1,3}", heading.text)[0]
         if len(episode_number) == 1:
-            episode_number = "0"+episode_number
+            episode_number = "0" + episode_number
         if episode_number not in episode_history:
             episode_history.append(episode_number)
 
@@ -72,7 +74,7 @@ if head_not_found_err:
 for i in tqdm(cached_html_chapters_path, "\033[0;1;94mProcessing...\033[0m⚙️"):
     episode_number = re.search(r"((\d{1,3})-episode)", str(i), flags=re.I).groups()[-1]
     if len(episode_number) == 1:
-        episode_number = "0"+episode_number
+        episode_number = "0" + episode_number
     chapter_number = re.search(r"(ch(\d{1,3}))", str(i), flags=re.I).groups()[-1]
     with open(i, "r") as f:
         # Removal of "next/prev chapter" elements.
@@ -92,16 +94,20 @@ for i in tqdm(cached_html_chapters_path, "\033[0;1;94mProcessing...\033[0m⚙️
             heading.name = "h2"
             # episode_number = re.findall(r"\d+", heading)[0]
             if episode_number not in episode_history:
-                heading.name = "h1" # for chapter break when converting to epub
+                heading.name = "h1"  # for chapter break when converting to epub
                 episode_history.append(episode_number)
 
     doc_md = html_to_md(soup)
     episode_dir = md_dir.joinpath(f"{episode_number}-episode")
     episode_dir.mkdir(parents=True, exist_ok=True)
 
-    with open(episode_dir.joinpath(f"{episode_number}-ch{chapter_number}.md"), "w") as f:
+    with open(
+        episode_dir.joinpath(f"{episode_number}-ch{chapter_number}.md"), "w"
+    ) as f:
         f.write(doc_md)
 
 
 if head_not_found_err:
-    print(f"\033[0;1;93mNo headings found for chapters\033[0;1m {head_not_found_err}💔️\033[0m")
+    print(
+        f"\033[0;1;93mNo headings found for chapters\033[0;1m {head_not_found_err}💔️\033[0m"
+    )

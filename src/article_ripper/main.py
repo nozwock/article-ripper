@@ -23,4 +23,5 @@ def html_to_md(
 ) -> str:
     return pypandoc.convert_text(source=html_text, to="md", format=format, *args)
 
+
 # Don't LAUGH!

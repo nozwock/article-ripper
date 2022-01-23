@@ -1,7 +1,0 @@
-beautifulsoup4==4.10.0
-black==21.12b0
-click==8.0.3
-pypandoc==1.7.2
-readability-lxml==0.8.1
-requests==2.27.1
-tqdm==4.62.3
