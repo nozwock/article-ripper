@@ -1,6 +1,6 @@
 # article-ripper
 
-A Simple article/readable content scrapper.
+**Simple article/readable content scrapper**
 
 #### Requirements
 
