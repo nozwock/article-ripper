@@ -5,7 +5,9 @@ from bs4 import BeautifulSoup as bs
 from article_ripper.main import get_document, html_to_md
 
 START_CHAPTER = 1
-LAST_CHAPTER = 246
+LAST_CHAPTER = 248
+FETCH_ONLY = False
+
 LINK_KD = "https://rainingtl.org/kidnapped-dragons-"
 DEST_DIR = Path(__file__).parent.joinpath("dst")
 
@@ -16,9 +18,8 @@ DEST_DIR = Path(__file__).parent.joinpath("dst")
 # is obviously very specific to this novel/format of article.
 
 if __name__ == "__main__":
-    episode_history = []
     head_not_found_err = []
-    # this is temporary, will rid of the need for this later.
+    # this is temporary, will rid of the need for this later maybe?.
 
     html_dir = DEST_DIR.joinpath("html-src")
     html_dir.mkdir(parents=True, exist_ok=True)
@@ -41,6 +42,8 @@ if __name__ == "__main__":
 
         soup = bs(doc_html, "lxml")
         heading = soup.find("h3")
+
+        chapter_number = "{0:03}".format(i)
         if heading is None:
             try:
                 for j in soup.find_all("strong"):
@@ -49,35 +52,45 @@ if __name__ == "__main__":
                         r"episode\s+(\d{2,3}):", str(j), flags=re.I
                     )
                     if _ep_num_find:
-                        head_not_found_err.append(f"ep{_ep_num_find.group(1)} ch{j}")
                         episode_number = _ep_num_find.group(1)
+                        head_not_found_err.append(
+                            f"ep{episode_number} ch{chapter_number}"
+                        )
                         break
                 if not _ep_num_find:
                     raise
-            except Exception:
-                episode_number = "err"
-                tqdm.write("Error")
+            except Exception as e:
+                episode_number = "ERR"
+                tqdm.write("Error!", end=" ")
+                tqdm.write(repr(e))
         else:
             episode_number = re.search(r"\d{1,3}", heading.text).group()
-        if len(episode_number) == 1:
-            episode_number = "0" + episode_number
-        # if episode_number not in episode_history:
-        #     episode_history.append(episode_number)
+        episode_number = "{0:03}".format(int(episode_number))
 
         html_episode_dir = html_dir.joinpath(f"{episode_number}-episode")
         html_episode_dir.mkdir(parents=True, exist_ok=True)
 
-        with open(html_episode_dir.joinpath(f"{episode_number}-ch{i}.html"), "w") as f:
+        with open(
+            html_episode_dir.joinpath(f"{episode_number}-ch{chapter_number}.html"), "w"
+        ) as f:
             f.write(doc_html)
 
+    if FETCH_ONLY:
+        exit(0)
+
     # ! Updating cache
-    for i in html_dir.rglob("*html"):
+    """
+    TODO(DONE✔️): sort this rglob & also need to fix ch num for that too.
+    for eg. like 003, 063, 212...instead of 3, 63, 212
+    """
+    for i in sorted(html_dir.rglob("*html")):
         cached_html_chapters_path.append(i)
 
     md_dir = DEST_DIR.joinpath("md-proc")
     md_dir.mkdir(parents=True, exist_ok=True)
 
-    # ! Post processing stuff and converting to md
+    episode_history = []
+    # ! Post processing stuff and converting to MD
     if head_not_found_err:
         # initializing again for cases when fetch loop is skipped
         # due to cache being present otherwise this list would remain empty.
@@ -85,9 +98,8 @@ if __name__ == "__main__":
 
     for i in tqdm(cached_html_chapters_path, "\033[0;1;94mProcessing...\033[0m⚙️"):
         episode_number = re.search(r"(\d{1,3})-episode", str(i), flags=re.I).group(1)
-        if len(episode_number) == 1:
-            episode_number = "0" + episode_number
         chapter_number = re.search(r"ch(\d{1,3})", str(i), flags=re.I).group(1)
+        # These should already be 3 digit ints so no need to do that again
         with open(i, "r") as f:
             # ! Removal of "next/prev chapter" elements.
             soup = bs(f, "lxml")
