@@ -27,7 +27,7 @@ if __name__ == "__main__":
     cached_html_chapters_num = []
     for i in html_dir.rglob("*html"):
         cached_html_chapters_num.append(
-            int(re.findall(r"(ch(\d{1,3}))", str(i), flags=re.I)[-1])
+            int(re.search(r"ch(\d{1,3})", str(i), flags=re.I).group(1))
         )
 
     # ! Downloading chapters separately
@@ -48,7 +48,7 @@ if __name__ == "__main__":
             except Exception:
                 episode_number = "err"
         else:
-            episode_number = re.findall(r"\d{1,3}", heading.text)[0]
+            episode_number = re.search(r"\d{1,3}", heading.text).group()
             if len(episode_number) == 1:
                 episode_number = "0" + episode_number
             if episode_number not in episode_history:
@@ -74,10 +74,10 @@ if __name__ == "__main__":
         head_not_found_err = []
 
     for i in tqdm(cached_html_chapters_path, "\033[0;1;94mProcessing...\033[0m⚙️"):
-        episode_number = re.findall(r"((\d{1,3})-episode)", str(i), flags=re.I)[-1]
+        episode_number = re.search(r"(\d{1,3})-episode", str(i), flags=re.I).group(1)
         if len(episode_number) == 1:
             episode_number = "0" + episode_number
-        chapter_number = re.findall(r"(ch(\d{1,3}))", str(i), flags=re.I)[-1]
+        chapter_number = re.search(r"ch(\d{1,3})", str(i), flags=re.I).group(1)
         with open(i, "r") as f:
             # ! Removal of "next/prev chapter" elements.
             soup = bs(f, "lxml")
