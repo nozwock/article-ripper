@@ -43,16 +43,26 @@ if __name__ == "__main__":
         heading = soup.find("h3")
         if heading is None:
             try:
-                head_not_found_err.append(f"ep{episode_history[-1]} ch{i}")
-                episode_number = episode_history[-1]
+                for j in soup.find_all("strong"):
+                    # ! lazy workaround for when can't find Hx
+                    _ep_num_find = re.search(
+                        r"episode\s+(\d{2,3}):", str(j), flags=re.I
+                    )
+                    if _ep_num_find:
+                        head_not_found_err.append(f"ep{_ep_num_find.group(1)} ch{j}")
+                        episode_number = _ep_num_find.group(1)
+                        break
+                if not _ep_num_find:
+                    raise
             except Exception:
                 episode_number = "err"
+                tqdm.write("Error")
         else:
             episode_number = re.search(r"\d{1,3}", heading.text).group()
-            if len(episode_number) == 1:
-                episode_number = "0" + episode_number
-            if episode_number not in episode_history:
-                episode_history.append(episode_number)
+        if len(episode_number) == 1:
+            episode_number = "0" + episode_number
+        # if episode_number not in episode_history:
+        #     episode_history.append(episode_number)
 
         html_episode_dir = html_dir.joinpath(f"{episode_number}-episode")
         html_episode_dir.mkdir(parents=True, exist_ok=True)
@@ -67,7 +77,7 @@ if __name__ == "__main__":
     md_dir = DEST_DIR.joinpath("md-proc")
     md_dir.mkdir(parents=True, exist_ok=True)
 
-    # Post processing stuff and converting to md
+    # ! Post processing stuff and converting to md
     if head_not_found_err:
         # initializing again for cases when fetch loop is skipped
         # due to cache being present otherwise this list would remain empty.
@@ -82,7 +92,7 @@ if __name__ == "__main__":
             # ! Removal of "next/prev chapter" elements.
             soup = bs(f, "lxml")
             for j in soup.find_all("p")[-10:]:
-                if re.search(r"(previous|next)\s+chapter", j.text, flags=re.IGNORECASE):
+                if re.search(r"(previous|next)\s+chapter", j.text, flags=re.I):
                     j.extract()
             # ! h3 to h2
             heading = soup.find("h3")
@@ -90,9 +100,15 @@ if __name__ == "__main__":
                 head_not_found_err.append(f"ep{episode_number} ch{chapter_number}")
 
                 for k in soup.find_all("strong"):
-                    # ! lazy workaround for when can't find hx
+                    # ! lazy workaround for when can't find Hx
                     if re.search(r"episode\s+\d{2,3}:", str(k), flags=re.I):
                         k.parent.name = "h2"
+                        # !!! CHECK the episode via re
+                        if episode_number not in episode_history:
+                            k.parent.name = (
+                                "h1"  # ! for chapter break when converting to epub
+                            )
+                            episode_history.append(episode_number)
             else:
                 heading.name = "h2"
                 if episode_number not in episode_history:
