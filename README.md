@@ -1,14 +1,16 @@
 # article-ripper
 
-Requirements:
-```
-Binaries
-- Python 3.10 or greater
-```
+A Simple article/readable content scrapper.
 
-Dependencies:
-`In the repo's root directory`
+#### Requirements
+
+article-ripper is heavily based on these two packages:
+
+* readability-lxml
+* pypandoc
+
+#### Installation Instructions
+
 ```
 pip install .
 ```
-
