@@ -16,6 +16,7 @@ tqdm = "^4.62.3"
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
 black = "^21.12b0"
+flake8 = "^4.0.1"
 
 [tool.black]
 line-length = 88
