@@ -91,10 +91,10 @@ if __name__ == "__main__":
             if heading is None:
                 head_not_found_err.append(f"ep{episode_history[-1]} ch{chapter_number}")
 
-                for i in soup.find_all("strong"):
+                for k in soup.find_all("strong"):
                     # ! lazy workaround for when can't find hx
-                    if re.search(r"episode\s+\d{2,3}:", str(i), flags=re.I):
-                        i.parent.name = "h2"
+                    if re.search(r"episode\s+\d{2,3}:", str(k), flags=re.I):
+                        k.parent.name = "h2"
             else:
                 heading.name = "h2"
                 if episode_number not in episode_history:
