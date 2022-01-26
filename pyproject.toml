@@ -6,7 +6,6 @@ authors = ["nozwock <57829219+nozwock@users.noreply.github.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-click = "^8.0.3"
 pypandoc = "^1.7.2"
 requests = "^2.27.1"
 readability-lxml = "^0.8.1"
