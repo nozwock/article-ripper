@@ -4,6 +4,9 @@ version = "0.1.0"
 description = ""
 authors = ["nozwock <57829219+nozwock@users.noreply.github.com>"]
 
+[tool.poetry.scripts]
+cli = "article_ripper.cli:run"
+
 [tool.poetry.dependencies]
 python = "^3.10"
 pypandoc = "^1.7.2"
