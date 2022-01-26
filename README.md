@@ -2,15 +2,19 @@
 
 **Simple article/readable content scrapper**
 
-#### Requirements
+#### Installation Instructions
 
-article-ripper is heavily based on these two packages:
+```sh
+python -m venv venv
+source venv/bin/activate
+pip install .
+```
+Or you could just use poetry instead with -
+```sh
+poetry install
+```
+
+#### Thanks to
 
 * readability-lxml
 * pypandoc
-
-#### Installation Instructions
-
-```
-pip install .
-```
