@@ -9,7 +9,7 @@ python -m venv venv
 source venv/bin/activate
 pip install .
 ```
-Or you could just use poetry instead with -
+Or you could just use poetry instead with:
 ```sh
 poetry install
 ```
