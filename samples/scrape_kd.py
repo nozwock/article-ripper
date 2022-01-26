@@ -15,23 +15,21 @@ DEST_DIR = Path(__file__).parent.joinpath("dst")
 
 # Scraping with some post-processing stuff.
 # Keep in mind that the steps during the post-processing stuff
-# is obviously very specific to this novel/format of article.
+# is obviously very specific to this novel/"format of article".
 
-if __name__ == "__main__":
-    head_not_found_err = []
-    # this is temporary, will rid of the need for this later maybe?.
+html_dir = DEST_DIR.joinpath("html-src")
+html_dir.mkdir(parents=True, exist_ok=True)
+md_dir = DEST_DIR.joinpath("md-proc")
+md_dir.mkdir(parents=True, exist_ok=True)
 
-    html_dir = DEST_DIR.joinpath("html-src")
-    html_dir.mkdir(parents=True, exist_ok=True)
 
-    cached_html_chapters_path = []
+def fetch_chapters() -> None:
     cached_html_chapters_num = []
     for i in html_dir.rglob("*html"):
         cached_html_chapters_num.append(
             int(re.search(r"ch(\d{1,3})", str(i), flags=re.I).group(1))
         )
 
-    # ! Downloading chapters separately
     for i in tqdm(
         range(START_CHAPTER, LAST_CHAPTER + 1),
         "\033[0;1;91mFetching Chapters...\033[0m🚀️",
@@ -53,9 +51,9 @@ if __name__ == "__main__":
                     )
                     if _ep_num_find:
                         episode_number = _ep_num_find.group(1)
-                        head_not_found_err.append(
-                            f"ep{episode_number} ch{chapter_number}"
-                        )
+                        # head_not_found_err.append(
+                        #     f"ep{episode_number} ch{chapter_number}"
+                        # )
                         break
                 if not _ep_num_find:
                     raise
@@ -75,27 +73,26 @@ if __name__ == "__main__":
         ) as f:
             f.write(doc_html)
 
-    if FETCH_ONLY:
-        exit(0)
 
-    # ! Updating cache
+def convert_chapters_to_md() -> None:
+    cached_html_chapters_path = []
+    for i in sorted(html_dir.rglob("*html")):
+        cached_html_chapters_path.append(i)
     """
     TODO(DONE✔️): sort this rglob & also need to fix ch num for that too.
     for eg. like 003, 063, 212...instead of 3, 63, 212
     """
-    for i in sorted(html_dir.rglob("*html")):
-        cached_html_chapters_path.append(i)
 
-    md_dir = DEST_DIR.joinpath("md-proc")
-    md_dir.mkdir(parents=True, exist_ok=True)
+    head_not_found_err = []
+    # this is temporary, will rid of the need for this later maybe?.
 
     episode_history = []
-    # ! Post processing stuff and converting to MD
-    if head_not_found_err:
-        # initializing again for cases when fetch loop is skipped
-        # due to cache being present otherwise this list would remain empty.
-        head_not_found_err = []
+    # if head_not_found_err:
+    #     # initializing again for cases when fetch loop is skipped
+    #     # due to cache being present otherwise this list would remain empty.
+    #     head_not_found_err = []
 
+    # ! Post processing stuff
     for i in tqdm(cached_html_chapters_path, "\033[0;1;94mProcessing...\033[0m⚙️"):
         episode_number = re.search(r"(\d{1,3})-episode", str(i), flags=re.I).group(1)
         chapter_number = re.search(r"ch(\d{1,3})", str(i), flags=re.I).group(1)
@@ -140,3 +137,10 @@ if __name__ == "__main__":
         print(
             f"⚠️  \033[0;1;93mThere might be issues with headings for chapters\033[0;1m {head_not_found_err}\033[0m"
         )
+
+
+if __name__ == "__main__":
+    fetch_chapters()
+    if FETCH_ONLY:
+        exit(0)
+    convert_chapters_to_md()

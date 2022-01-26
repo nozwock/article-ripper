@@ -12,7 +12,7 @@ def fun(url: str, out: Optional[str] = None) -> None:
     if out is None:
         print(doc_summary)
     else:
-        with open(out, 'w') as f:
+        with open(out, "w") as f:
             f.write(doc_summary)
 
 
