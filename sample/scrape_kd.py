@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 from tqdm import tqdm
 from bs4 import BeautifulSoup as bs
-from article_ripper.main import get_document, html_to_md
+from article_ripper import get_document, html_to_md
 
 START_CHAPTER = 1
 LAST_CHAPTER = 248
