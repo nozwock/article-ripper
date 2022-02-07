@@ -5,13 +5,19 @@ from bs4 import BeautifulSoup as bs
 from article_ripper import get_document, html_to_md
 
 START_CHAPTER = 1
-LAST_CHAPTER = 248
+LAST_CHAPTER = 253
 FETCH_ONLY = False
 
 LINK_KD = "https://rainingtl.org/kidnapped-dragons-"
 DEST_DIR = Path(__file__).parent.joinpath("dst")
 
-# TODO: add a parameter to remove those "Sponsered Ads"
+FILTER_IMG = [
+    "https://i0.wp.com/rainingtl.org/wp-content/uploads/2021/07/Levi-Ad-1.png",
+]
+
+
+# Ad segments & stuff
+# TODO(DONE✔️): add a parameter to remove those "Sponsered Ads"
 
 # Scraping with some post-processing stuff.
 # Keep in mind that the steps during the post-processing stuff
@@ -60,7 +66,7 @@ def fetch_chapters() -> None:
             except Exception as e:
                 episode_number = "ERR"
                 tqdm.write("Error!", end=" ")
-                tqdm.write(repr(e))
+                tqdm.write(f"{e!r}")
         else:
             episode_number = re.search(r"\d{1,3}", heading.text).group()
         episode_number = "{0:03}".format(int(episode_number))
@@ -97,24 +103,64 @@ def convert_chapters_to_md() -> None:
         episode_number = re.search(r"(\d{1,3})-episode", str(i), flags=re.I).group(1)
         chapter_number = re.search(r"ch(\d{1,3})", str(i), flags=re.I).group(1)
         # These should already be 3 digit ints so no need to do that again
+
+        # tqdm.write(f"🗃 {str(i)}")
+
         with open(i, "r") as f:
-            # ! Removal of "next/prev chapter" elements.
             soup = bs(f, "lxml")
-            for j in soup.find_all("p")[-10:]:
+
+            # ! Filtering out Ad images
+            for j in soup.find_all("img"):
+                for k in FILTER_IMG:
+                    # tqdm.write(f"📄 {j['src']}")
+                    if re.search(rf"{k}", j["src"], flags=re.I):
+                        # tqdm.write(f"🔱 check\n{k}")
+                        _temp_elem = j
+                        # just iterating 3 times just because I feel that should be enough
+                        # for our use case here
+                        for _ in range(3):
+                            # we want to move up in the hierarchy until we include
+                            # the <figure> tag
+                            if (
+                                len(_temp_elem.parent.get_text(strip=True)) == 0
+                                or _temp_elem.parent.name == "figure"
+                            ):
+                                _temp_elem = _temp_elem.parent
+                                # tqdm.write(f"\n✅success {str(_temp_elem)[:300]}...\n")
+                            else:
+                                # tqdm.write(
+                                #     f"\n❌️fail {str(_temp_elem.parent)[:350]}...\n"
+                                # )
+                                _temp_elem.extract()
+                                break
+                        # j.extract()
+                        # print(len(j.parent.get_text(strip=True)))\
+                    else:
+                        # tqdm.write(f"{j['src']}")
+                        pass
+                    # if re.search(rf"{k}", k, flags=re.I):
+                    #     break
+
+            # ! Removal of "next/prev chapter" elements.
+            # tqdm.write(f"😎 {[str(j)[:150] for j in soup.find_all('p')[:-11:-1]]}")
+            for j in soup.find_all("p")[:-11:-1]:
                 if re.search(r"(previous|next)\s+chapter", j.text, flags=re.I):
+                    # tqdm.write(f"📥 deleted {str(j)}")
                     j.extract()
+
             # ! h3 to h2
+            # hmm maybe this is unnecessary we could instead just have epub chapters break at h2
             heading = soup.find("h3")
             if heading is None:
                 head_not_found_err.append(f"ep{episode_number} ch{chapter_number}")
 
-                for k in soup.find_all("strong"):
+                for j in soup.find_all("strong"):
                     # ! lazy workaround for when can't find Hx
-                    if re.search(r"episode\s+\d{2,3}:", str(k), flags=re.I):
-                        k.parent.name = "h2"
+                    if re.search(r"episode\s+\d{2,3}:", str(j), flags=re.I):
+                        j.parent.name = "h2"
                         # !!! CHECK the episode via re
                         if episode_number not in episode_history:
-                            k.parent.name = (
+                            j.parent.name = (
                                 "h1"  # ! for chapter break when converting to epub
                             )
                             episode_history.append(episode_number)
