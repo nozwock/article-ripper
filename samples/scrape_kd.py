@@ -30,11 +30,10 @@ md_dir.mkdir(parents=True, exist_ok=True)
 
 
 def fetch_chapters() -> None:
-    cached_html_chapters_num = []
-    for i in html_dir.rglob("*html"):
-        cached_html_chapters_num.append(
-            int(re.search(r"ch(\d{1,3})", str(i), flags=re.I).group(1))
-        )
+    cached_html_chapters_num = [
+        int(re.search(r"ch(\d{1,3})", str(i), flags=re.I).group(1))
+        for i in html_dir.rglob("*html")
+    ]
 
     for i in tqdm(
         range(START_CHAPTER, LAST_CHAPTER + 1),
@@ -81,9 +80,7 @@ def fetch_chapters() -> None:
 
 
 def convert_chapters_to_md() -> None:
-    cached_html_chapters_path = []
-    for i in sorted(html_dir.rglob("*html")):
-        cached_html_chapters_path.append(i)
+    cached_html_chapters_path = [i for i in sorted(html_dir.rglob("*html"))]
     """
     TODO(DONE✔️): sort this rglob & also need to fix ch num for that too.
     for eg. like 003, 063, 212...instead of 3, 63, 212
